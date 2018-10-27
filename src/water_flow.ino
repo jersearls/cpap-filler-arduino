@@ -1,30 +1,19 @@
-byte sensorInterrupt = 2;  // 0 = digital pin 2
-byte sensorPin       = 2;
+Servo catArm;  // create servo object to control a servo
 
-volatile int pulseCount;
+#define PUMP 3
 
 void setup()
 {
-  Serial.begin(9600);
-
-  pinMode(sensorPin, INPUT);
-  digitalWrite(sensorPin, HIGH);
-
-  pulseCount        = 0;
-
-  attachInterrupt(sensorInterrupt, pulseCounter, FALLING);
-}
-// 1,380 pulses per Liter?
-// other source 2760 pulses per liter
-
-void loop()
-{
-    Serial.print("PulseCount: ");
-    Serial.println(int(pulseCount));  // Print the integer part of the variable
-    delay(1000);
+  pinMode(PUMP, OUTPUT);
+  Particle.function("Pump", Pump) ;
 }
 
-void pulseCounter()
-{
-  pulseCount++;
+// TOGGLE PUMP
+int Pump(String message) {
+  if (message == "0") {
+    digitalWrite(PUMP, LOW);
+  }
+  else if (message == "1") {
+    digitalWrite(PUMP, HIGH);
+  }
 }
