@@ -1,8 +1,10 @@
 #define PUMP 3
 LEDSystemTheme theme; // Enable custom theme
 
-int seconds;
+int milliseconds;
+String seconds;
 bool pumpStatus = false;
+bool pump;
 
 void setup()
 {
@@ -13,32 +15,37 @@ void setup()
   Particle.function("ManualPump", ManualPump);
 }
 
-// Run pump with seconds argument
-int Pump(String message) {
-  seconds = message.toInt() * 1000;
-
-  if (seconds == 0) {
-    digitalWrite(PUMP, LOW);
-  }
-  else if (seconds >= 1) {
-    Particle.publish("Running Pump for " + message + " seconds");
+void loop() {
+  //run if pump is true
+  if (pump) {
+    Particle.publish("Running Pump for " + seconds + " seconds");
     digitalWrite(PUMP, HIGH);
-    delay(seconds);
+    delay(milliseconds);
     digitalWrite(PUMP, LOW);
     Particle.publish("Stopping Pump");
+    pump = false;
   }
 }
 
-// TOGGLE PUMP ON/OFF
+//cloud functions
+
+// Run pump with seconds argument
+int Pump(String message) {
+  seconds = message;
+  milliseconds = seconds.toInt() * 1000;
+  pump = true;
+}
+
+// Toggle pump on/off
 int ManualPump(String message) {
-  if (pumpStatus == false) {
+  if (!pumpStatus) {
     Particle.publish("Running Pump");
     pumpStatus = true;
     digitalWrite(PUMP, HIGH);
   }
-  else if (pumpStatus == true) {
+  else if (pumpStatus) {
     digitalWrite(PUMP, LOW);
-    Particle.publish("Stopping Pump");
     pumpStatus = false;
+    Particle.publish("Stopping Pump");
   }
 }
