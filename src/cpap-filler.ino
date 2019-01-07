@@ -41,7 +41,7 @@ void loop() {
   } else if (pump && floatState == HIGH){
     stopPump();
   } else if (!deviceError && pump && floatState == LOW) {
-    //digitalWrite(PUMP, HIGH);
+    digitalWrite(PUMP, HIGH);
     count += 1;
   }
   delay(1000);
