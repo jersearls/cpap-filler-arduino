@@ -4,32 +4,44 @@ int FLOAT_SWITCH = D6;
 
 //define variables
 LEDSystemTheme theme; // Enable custom theme
-volatile int count ;
+volatile int count = 0;
+int floatState;
 bool deviceError = false;
 bool pumpStatus = false;
 bool pump;
+String currentTime;
+String setTime = "10:30";
 
 void setup()
 {
+  Time.zone(-5);
   theme.setColor(LED_SIGNAL_CLOUD_CONNECTED, 0x00000000); // Set LED_SIGNAL_NETWORK_ON to no color
   theme.apply(); // Apply theme settings
   pinMode(PUMP, OUTPUT);
   pinMode(FLOAT_SWITCH, INPUT_PULLUP);
   Particle.function("Pump", Pump);
   Particle.function("ManualPump", ManualPump);
-  Particle.variable("Device Error Mode", deviceError) ;
+  Particle.function("SetTime", SetTime);
+  Particle.variable("DeviceError", deviceError);
+  Particle.variable("CurrentTime", currentTime);
+  Particle.variable("FloatState", floatState);
+  Particle.variable("SetTime", setTime);
 }
 
 void loop() {
-  int floatState = digitalRead( FLOAT_SWITCH );
-  if (count > 3 ) {
+  floatState = digitalRead( FLOAT_SWITCH );
+  currentTime = Time.format(Time.now(), "%H:%M") ;
+
+  if (currentTime == setTime && !pump && floatState == LOW) {
+    Pump("String");
+  } else if (count > 300) {
     stopPump();
     deviceError = true;
-    Particle.publish("Filling Error: Chk H2O & Power Cycle");
-  } else if (floatState == HIGH && count > 0){
+    Particle.publish("Filling Error", "Chk H2O & Power Cycle");
+  } else if (pump && floatState == HIGH){
     stopPump();
   } else if (!deviceError && pump && floatState == LOW) {
-    digitalWrite(PUMP, HIGH);
+    //digitalWrite(PUMP, HIGH);
     count += 1;
   }
   delay(1000);
@@ -48,6 +60,10 @@ void stopPump() {
 int Pump(String message) {
   Particle.publish("Running Pump");
   pump = true;
+}
+
+int SetTime(String message) {
+  setTime = message;
 }
 
 // Toggle pump on/off
