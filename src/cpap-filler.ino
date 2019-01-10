@@ -34,7 +34,7 @@ void loop() {
 
   if (currentTime == setTime && !pump && floatState == LOW) {
     Pump("String");
-  } else if (count > 300) {
+  } else if (count > 250) {
     stopPump();
     deviceError = true;
     Particle.publish("Filling Error", "Chk H2O & Power Cycle");
