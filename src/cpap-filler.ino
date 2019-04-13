@@ -98,8 +98,6 @@ int ManualPump(String message)
   }
   else if (pumpStatus)
   {
-    digitalWrite(PUMP, LOW);
-    pumpStatus = false;
-    Particle.publish("Stopping Pump");
+    stopPump();
   }
 }
