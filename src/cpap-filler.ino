@@ -10,7 +10,7 @@ int pumpDurationInt;
 bool deviceError = false;
 bool pumpStatus = false;
 bool pump;
-String pumpDuration = "250";
+String pumpDuration = "90";
 String currentTime;
 String setTime = "10:30";
 
@@ -98,6 +98,7 @@ int ManualPump(String message)
   }
   else if (pumpStatus)
   {
+    pumpStatus = false;
     stopPump();
   }
 }
