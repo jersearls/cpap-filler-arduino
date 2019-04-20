@@ -9,7 +9,7 @@ int floatState;
 int pumpDurationInt;
 bool deviceError = false;
 bool pumpStatus = false;
-bool pump;
+bool pump = false;
 String pumpDuration = "90";
 String currentTime;
 String setTime = "10:30";
