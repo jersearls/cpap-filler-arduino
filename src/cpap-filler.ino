@@ -7,10 +7,10 @@ LEDSystemTheme theme; // Enable custom theme
 volatile int count = 0;
 int floatState;
 int pumpDurationInt;
-bool deviceError = false;
+bool pumpScheduled = true;
 bool pumpStatus = false;
 bool pump = false;
-String pumpDuration = "90";
+String pumpDuration = "60";
 String currentTime;
 String setTime = "10:30";
 
@@ -25,11 +25,12 @@ void setup()
   Particle.function("ManualPump", ManualPump);
   Particle.function("SetTime", SetTime);
   Particle.function("SetPumpDuration", SetPumpDuration);
-  Particle.variable("DeviceError", deviceError);
+  Particle.function("SchedulePump", SchedulePump);
   Particle.variable("CurrentTime", currentTime);
   Particle.variable("FloatState", floatState);
   Particle.variable("AutoPumpTime", setTime);
   Particle.variable("PumpDuration", pumpDuration);
+  Particle.variable("PumpScheduled", pumpScheduled);
 }
 
 void loop()
@@ -45,14 +46,14 @@ void loop()
   else if (count > pumpDurationInt)
   {
     stopPump();
-    deviceError = true;
-    Particle.publish("Filling Error", "Chk H2O & Power Cycle");
+    pumpScheduled = false;
+    Particle.publish("Filling Error", "Check Water!");
   }
   else if (pump && floatState == HIGH)
   {
     stopPump();
   }
-  else if (!deviceError && pump && floatState == LOW)
+  else if (pumpScheduled && pump && floatState == LOW)
   {
     digitalWrite(PUMP, HIGH);
     count += 1;
@@ -85,6 +86,18 @@ int SetTime(String message)
 int SetPumpDuration(String message)
 {
   pumpDuration = message;
+}
+
+int SchedulePump(String message)
+{
+  if (!pumpScheduled)
+  {
+    pumpScheduled = true;
+  }
+  else if (pumpScheduled)
+  {
+    pumpScheduled = false;
+  }
 }
 
 // Toggle pump on/off
