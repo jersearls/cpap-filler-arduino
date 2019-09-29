@@ -66,11 +66,14 @@ void loop()
 //local functions
 void stopPump()
 {
-  digitalWrite(PUMP, LOW);
-  Particle.publish("Info", "Stopping Pump");
-  fillFromEmpty = false;
-  pump = false;
-  count = 0;
+  if (digitalRead(PUMP) == HIGH)
+  {
+    digitalWrite(PUMP, LOW);
+    Particle.publish("Info", "Stopping Pump");
+    fillFromEmpty = false;
+    pump = false;
+    count = 0;
+  }
 }
 
 //cloud functions
@@ -108,5 +111,6 @@ int FillFromEmpty(String message)
 {
   Particle.publish("Info", "Filling From Empty");
   fillFromEmpty = true;
+  pumpScheduled = true;
   Pump("String");
 }
