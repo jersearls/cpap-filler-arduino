@@ -66,13 +66,13 @@ void loop()
 //local functions
 void stopPump()
 {
+  fillFromEmpty = false;
+  pump = false;
+  count = 0;
   if (digitalRead(PUMP) == HIGH)
   {
     digitalWrite(PUMP, LOW);
     Particle.publish("Info", "Stopping Pump");
-    fillFromEmpty = false;
-    pump = false;
-    count = 0;
   }
 }
 
